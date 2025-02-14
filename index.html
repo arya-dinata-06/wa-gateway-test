@@ -1,0 +1,56 @@
+<!--index.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WhatsApp Gateway</title>
+</head>
+<body>
+    <h1>Scan WhatsApp QR Code</h1>
+    <div id="qrcode"></div>
+    <div id="status"></div>
+    <button onclick="resetClient()">Reset Client</button>
+
+    <script>
+        const qrcodeDiv = document.getElementById('qrcode');
+        const statusDiv = document.getElementById('status');
+        
+        function checkQR() {
+            fetch('/qr')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.qr) {
+                        qrcodeDiv.innerHTML = `<img src="${data.qr}" />`;
+                        statusDiv.innerHTML = 'Scan QR code...';
+                        setTimeout(checkQR, 1000);
+                    } else {
+                        statusDiv.innerHTML = data.message || 'Connected!';
+                        if (!data.message || data.message.includes('Connected')) {
+                            qrcodeDiv.innerHTML = '';
+                        } else {
+                            setTimeout(checkQR, 1000);
+                        }
+                    }
+                })
+                .catch(error => {
+                    statusDiv.innerHTML = 'Error: ' + error;
+                    setTimeout(checkQR, 5000);
+                });
+        }
+        
+        function resetClient() {
+            statusDiv.innerHTML = 'Resetting client...';
+            fetch('/reset', { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    statusDiv.innerHTML = data.message;
+                    setTimeout(checkQR, 1000);
+                })
+                .catch(error => {
+                    statusDiv.innerHTML = 'Reset error: ' + error;
+                });
+        }
+        
+        checkQR();
+    </script>
+</body>
+</html>

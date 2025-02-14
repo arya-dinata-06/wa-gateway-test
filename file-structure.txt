@@ -1,0 +1,7 @@
+whatsapp-web-api/
+├── server.js
+├── index.html
+├── package.json
+├── package-lock.json
+├── .gitignore
+└── README.md
